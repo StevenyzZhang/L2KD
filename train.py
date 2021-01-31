@@ -53,7 +53,7 @@ def train(task_ids, model):
 
     if not model:
         # which_model_to_load = model_dir if os.path.isfile(os.path.join(model_dir, FINAL_SAVE_NAME)) else args.model_name
-        model = MODEL_CLASS.from_pretrained(args.model_name).cuda()
+        model = MODEL_CLASS.from_pretrained('./PModel').cuda()
         model.resize_token_embeddings(len(TOKENIZER))
         if not args.fp32:
             model = FP16_Module(model)
@@ -102,7 +102,7 @@ def train(task_ids, model):
         for i in range(4):
             TOKENS_WEIGHT = torch.cat((TOKENS_WEIGHT, torch.ones([1]).cuda()))
     if args.distil:
-        teacher_model = MODEL_CLASS.from_pretrained(args.model_name).cuda()
+        teacher_model = MODEL_CLASS.from_pretrained('./PModel').cuda()
         teacher_vocab_size = json.load(open("models/gpt2/lll/{task}_0.2/{task}/config.json".format(task=tasks[0])))['vocab_size']
         teacher_model.resize_token_embeddings(teacher_vocab_size)
         print("load teacher model from {}".format("models/gpt2/lll/{task}_0.2/{task}/model-finish".format(task=tasks[0])))

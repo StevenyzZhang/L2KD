@@ -114,7 +114,8 @@ def parse_args():
         logger.warning('Not all gpus support fp16 training! Will use fp32 instead.')
         args.fp32 = True
     if args.model_name == "openai-gpt":
-        args.fp32 = True  # openai-gpt currently doesn't support fp16
+        logger.warning('openai-gpt is not supported now!')
+        exit(0)
     if not args.fp32:
         global MEMORY_FACTOR
         if args.distil:
@@ -135,11 +136,11 @@ def parse_args():
         special_tokens["sep_token"] = '__sep__'
 
     model_class, tokenizer_class, config_class = MODEL_CLASSES[args.model_name]
-    tokenizer = tokenizer_class.from_pretrained(args.model_name)
+    tokenizer = tokenizer_class.from_pretrained('./PModel/vocab.json')
     tokenizer.add_tokens(list(special_tokens.values()))
     special_token_ids = {k:tokenizer.convert_tokens_to_ids(v) for k,v in special_tokens.items()}
 
-    model_config = config_class.from_pretrained(args.model_name)
+    model_config = config_class.from_pretrained('./PModel')
     model_config.vocab_size = len(tokenizer)
     tokens_weight = torch.ones([model_config.vocab_size], dtype=torch.float).cuda()
     tokens_weight[special_token_ids["ans_token"]] = args.tokens_weight
